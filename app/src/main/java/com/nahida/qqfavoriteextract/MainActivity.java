@@ -2,6 +2,7 @@ package com.nahida.qqfavoriteextract;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,7 +12,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Button button = findViewById(R.id.button);
+        button.setOnClickListener(v -> Nya());
         // 创建AlertDialog.Builder对象
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("欢迎")
@@ -33,5 +35,9 @@ public class MainActivity extends AppCompatActivity {
         // 显示对话框
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    private void Nya() {
+        Toast.makeText(this, "喵~", Toast.LENGTH_SHORT).show();
     }
 }
