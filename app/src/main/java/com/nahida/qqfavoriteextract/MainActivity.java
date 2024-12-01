@@ -2,6 +2,8 @@ package com.nahida.qqfavoriteextract;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -18,12 +20,14 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // 处理确定按钮点击事件
+                        Toast.makeText(MainActivity.this, "你点击了确定按钮", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // 处理取消按钮点击事件
+                        Toast.makeText(MainActivity.this, "你点击取消按钮", Toast.LENGTH_SHORT).show();
                     }
                 });
         // 显示对话框
