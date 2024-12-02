@@ -7,17 +7,34 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <!-- 按钮保持居中 -->
     <Button
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="一键提取"
+        android:text="一键提取表情包并保存到相册"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5" />
+
+    <!-- TextView 自适应高度并向下延伸 -->
+    <TextView
+        android:id="@+id/st"
+        android:layout_width="407dp"
+        android:layout_height="42dp"
+        android:gravity="center"
+        android:text="点击上方按钮开始提取"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintWidth_percent="0.9" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
