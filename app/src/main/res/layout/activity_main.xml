@@ -12,7 +12,7 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="一键提取表情包并保存到相册"
+        android:text="这是一个按钮"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -22,11 +22,11 @@
 
     <!-- TextView 自适应高度并向下延伸 -->
     <TextView
-        android:id="@+id/st"
+        android:id="@+id/status"
         android:layout_width="407dp"
         android:layout_height="42dp"
         android:gravity="center"
-        android:text="点击上方按钮开始提取"
+        android:text="这是一个TextView"
         android:textColor="@color/black"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
