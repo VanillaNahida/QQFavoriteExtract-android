@@ -2,15 +2,18 @@ package com.nahida.qqfavoriteextract;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
@@ -28,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     // 定义权限请求码
     private static final int REQUEST_CODE = 1024;
+    public static int WRITE_REQUEST_CODE = 10002;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,13 +50,53 @@ public class MainActivity extends AppCompatActivity {
         TextView status = findViewById(R.id.status);
         if (!requestPermission()) {
             // 申请权限
+            status.setText("没有权限，正在申请中");
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
         } else {
             status.setText("已有存储权限，尝试写入1.txt测试文本到Andro/data目录");
-            write_text_to_data_directory();
+            if (!write_text_to_data_directory()) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("提示")
+                        .setMessage("写入文件失败\n是否使用DocumentUI授权访问Data目录？")
+                        .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // 处理确定按钮点击事件
+                                openDocumentTree();
+                            }
+                        })
+                        .setNegativeButton("否", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // 处理取消按钮点击事件
+                            }
+                        });
+                // 显示对话框
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
         }
     }
 
+
+    @SuppressLint("WrongConstant")
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_OPEN_DOCUMENT_TREE && resultCode == RESULT_OK) {
+            if (data != null) {
+                Uri treeUri = data.getData();
+                // 持久化权限
+                final int takeFlags = data.getFlags() &
+                        (Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                                Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                getContentResolver().takePersistableUriPermission(treeUri, takeFlags);
+                // 存储URI以便后续使用
+                SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+                prefs.edit().putString("tree_uri", treeUri.toString()).apply();
+            }
+        }
+    }
 
     @SuppressLint("NewApi")
     private boolean requestPermission() {
@@ -118,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //检查文件能否写入到data目录，如果不能，就拉起document-ui来授权QQ数据目录
-    private void write_text_to_data_directory() {
+    private boolean write_text_to_data_directory() {
         TextView status = findViewById(R.id.status);
         String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/1.txt";
         File file = new File(filePath);
@@ -127,10 +171,12 @@ public class MainActivity extends AppCompatActivity {
             osw.write("纳西妲世界第一可爱！\n\n香草味的纳西妲");
             Toast.makeText(this, "文件写入成功", Toast.LENGTH_SHORT).show();
             status.setText("写入成功！在/sdcard/Android/data/1.txt中");
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(this, "文件写入失败", Toast.LENGTH_SHORT).show();
             status.setText("文件写入失败！");
+            return false;
         }
     }
 
@@ -206,4 +252,28 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
+    // 在Activity中启动Document UI选择器
+    private static final int REQUEST_CODE_OPEN_DOCUMENT_TREE = 42;
+
+    private void openDocumentTree() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        // 可选：指定初始目录为Android/data
+        Uri initialUri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fdata/document/primary%3AAndroid%2Fdata");
+        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri);
+        startActivityForResult(intent, REQUEST_CODE_OPEN_DOCUMENT_TREE);
+    }
+
+    //使用SAF创建并写入文件
+    public void createFile() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        // 文件类型
+        intent.setType("text/plain");
+        // 文件名称
+        intent.putExtra(Intent.EXTRA_TITLE, System.currentTimeMillis() + ".txt");
+        startActivityForResult(intent, WRITE_REQUEST_CODE);
+
+    }
+    
 }
